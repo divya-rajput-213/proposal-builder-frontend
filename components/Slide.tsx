@@ -1,5 +1,7 @@
 "use client";
 
+import { useMakeCopilotActionable } from "@copilotkit/react-core";
+
 // Define an interface for the model of a slide, specifying the expected structure of a slide object.
 export interface SlideModel {
   title: string;
@@ -18,13 +20,60 @@ export interface SlideProps {
 export const Slide = (props: SlideProps) => {
     // Define a constant for the height of the area reserved for speaker notes.
     const heightOfSpeakerNotes = 150;
-
+  
     // Construct a URL for the background image using the description from slide properties, dynamically fetching an image from Unsplash.
     const backgroundImage =
       'url("https://source.unsplash.com/featured/?' +
       encodeURIComponent(props.slide.backgroundImageDescription) +
       '")';
 
+    
+
+    useMakeCopilotActionable({
+        // Defines the action name. This is a unique identifier for the action within the application.
+        name: "updateSlide",
+        // Describes what the action does. In this case, it updates the current slide.
+        description: "Update the current slide.",
+        // Details the arguments that the action accepts. Each argument has a name, type, description, and a flag indicating if it's required.
+        argumentAnnotations: [
+        {
+            name: "title", // The argument name.
+            type: "string", // The data type of the argument.
+            description: "The title of the slide. Should be a few words long.", // Description of the argument.
+            required: true, // Indicates that this argument must be provided for the action to execute.
+        },
+        {
+            name: "content",
+            type: "string",
+            description: "The content of the slide. Should generally consists of a few bullet points.",
+            required: true,
+        },
+        {
+            name: "backgroundImageDescription",
+            type: "string",
+            description: "What to display in the background of the slide. For example, 'dog', 'house', etc.",
+            required: true,
+        },
+        {
+            name: "spokenNarration",
+            type: "string",
+            description: "The spoken narration for the slide. This is what the user will hear when the slide is shown.",
+            required: true,
+        },
+        ],
+        // The implementation of the action. This is a function that will be called when the action is executed.
+        implementation: async (title, content, backgroundImageDescription, spokenNarration) => {
+        // Calls a function passed in through props to partially update the slide with new values for the specified properties.
+        props.partialUpdateSlide({
+            title,
+            content,
+            backgroundImageDescription,
+            spokenNarration,
+        });
+        },
+    }, [props.partialUpdateSlide]); // Dependencies array for the custom hook or function. This ensures that the action is re-initialized only when `props.partialUpdateSlide` changes.
+    
+  
     // Return JSX for the slide component.
     return (
       <>
@@ -53,7 +102,7 @@ export const Slide = (props: SlideProps) => {
               }}
             />
           </div>
-
+  
           {/* Container for the slide content with background image. */}
           <div className="h-4/5 flex"
             style={{
@@ -76,7 +125,7 @@ export const Slide = (props: SlideProps) => {
             />
           </div>
         </div>
-
+  
         {/* Textarea for entering spoken narration with specified height and styling for consistency. */}
         <textarea
           className=" w-9/12 h-full bg-transparent text-5xl p-10 resize-none bg-gray-500 pr-36"
@@ -97,3 +146,4 @@ export const Slide = (props: SlideProps) => {
       </>
     );
   };
+  
