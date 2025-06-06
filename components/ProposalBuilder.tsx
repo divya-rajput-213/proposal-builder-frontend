@@ -86,7 +86,7 @@ const ProposalBuilder: React.FC = () => {
         form.append("file", file);
       });
   
-      const response = await fetch("https://51d4-49-249-18-30.ngrok-free.app/", {
+      const response = await fetch("https://92c8-49-249-18-30.ngrok-free.app", {
         method: "POST",
         body: form,
       });
